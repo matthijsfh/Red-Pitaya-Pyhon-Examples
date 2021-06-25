@@ -41,8 +41,6 @@ def PreparePlot(Scope):
    
     plt.tight_layout()
     plt.title('Simple Red Pitaya Scope')
-
-
     
     return fig, plt, line1, line2, ax1
 
@@ -60,7 +58,6 @@ def SetPlotYAxis(axis, YRange):
 
     return
     
-
 
 def UpdatePlot(fig, line1, line2, Data1, Data2):
     line1.set_ydata(Data1)

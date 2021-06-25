@@ -12,6 +12,9 @@ import numpy as np
 # <level> = {value in V}
 # <mode> = {AC,DC}
 
+#==============================================================================
+# Scope class
+#==============================================================================
 class redpitaya_scope:
     rp = []
     NrSamples           = int(16384)
@@ -26,8 +29,6 @@ class redpitaya_scope:
     Average             = 0;
     
     def __init__(self, pitaya):
-        # self.ip = ip
-        # self.rp = scpi.scpi(ip)
         self.rp = pitaya
         self.rp.tx_txt('ACQ:DATA:FORMAT ASCII')
         self.rp.tx_txt('ACQ:RST')
@@ -199,21 +200,82 @@ class redpitaya_scope:
         Gain = self.Probe[Channel-1] * self.Gain[Channel-1]
         return Gain
 
-    # def init_scope():
-    # # https://github.com/RedPitaya/RedPitaya/blob/master/scpi-server/src/scpi-commands.c#L96-L204
-    # rp_s.tx_txt('ACQ:RST')
-    # rp_s.tx_txt('ACQ:START')
+#==============================================================================
+# Signal generator class
+#==============================================================================
+class redpitaya_generator:
+    rp                  = []
+    NrSamples           = int(16384)
+    GenSignalType       = np.array([0.0, 0.0])
+    Amplitude           = np.array([1.0, 1.0])
+    Frequency           = np.array([100.0, 100.0])
 
-    # # rp_s.tx_txt('ACQ:SOUR1:GAIN HV')
-    # rp_s.tx_txt('ACQ:SOUR1:GAIN LV')
-    # rp_s.tx_txt('ACQ:TRIG:LEV 0')
-    # rp_s.tx_txt('ACQ:TRIG:DLY 8192')
-    # # rp_s.tx_txt('ACQ:SOUR2:GAIN HV')
-    # rp_s.tx_txt('ACQ:SOUR2:GAIN LV')
+    # {SINE, SQUARE, TRIANGLE, SAWU, SAWD, PWM, ARBITRARY, DC, DC_NEG}
 
-    # # rp_s.tx_txt('ACQ:DEC 4096')
-    # # rp_s.tx_txt('ACQ:DEC 256')
-    # rp_s.tx_txt('ACQ:DEC 16')
+    def __init__(self, pitaya):
+        self.rp = pitaya
+        return
 
+    #==============================================================================
+    # Sine wave
+    #==============================================================================
+    def Sine(self, Channel = 1, Amplitude = 1.0, Frequency = 100):
+        self.GenSignalType[Channel - 1] = 0
+        self.Amplitude[Channel - 1] = Amplitude
+        self.Frequency[Channel - 1] = Frequency
+        self.ConfigureSignalGen(Channel)
+        return
+        
+    def ConfigureSignalGen(self, Channel = 1):
+        #sine
+        if (self.GenSignalType[Channel -1] == 0):
+            if (Channel == 1):
+                self.rp.tx_txt('SOUR1:FUNC SINE')       
     
+            if (Channel == 2):
+                self.rp.tx_txt('SOUR2:FUNC SINE')        
+            
+        # square
+        if (self.GenSignalType[Channel -1] == 1):
+            if (Channel == 1):
+                self.rp.tx_txt('SOUR1:FUNC SQUARE')       
     
+            if (Channel == 2):
+                self.rp.tx_txt('SOUR2:FUNC SQUARE')        
+
+        # generic configuration
+        if (Channel == 1):
+            Ampl = ("%.3f" % self.Amplitude[0])
+            self.rp.tx_txt('SOUR1:VOLT ' + str(Ampl))
+            self.rp.tx_txt('SOUR1:FREQ:FIX ' + str(self.Frequency[0]))        
+
+        if (Channel == 2):
+            Ampl = ("%.3f" % self.Amplitude[1])
+            self.rp.tx_txt('SOUR2:VOLT ' + str(Ampl))
+            self.rp.tx_txt('SOUR2:FREQ:FIX ' + str(self.Frequency[1]))        
+            
+        return
+
+    #==============================================================================
+    # Square wave
+    #==============================================================================
+    def Square(self, Channel = 1, Amplitude = 1.0, Frequency = 100):
+        self.GenSignalType[Channel - 1] = 1
+        self.Amplitude[Channel - 1] = Amplitude
+        self.Frequency[Channel - 1] = Frequency
+        self.ConfigureSignalGen(Channel)
+        return
+        
+    def EnableOutput(self, Channel = 1):
+        if (Channel == 1):
+            self.rp.tx_txt('OUTPUT1:STATE ON')
+        if (Channel == 2):
+            self.rp.tx_txt('OUTPUT2:STATE ON')
+        return
+        
+    def EnableBothOutputs(self):
+        self.rp.tx_txt('OUTPUT:STATE ON')
+        return
+        
+
+
