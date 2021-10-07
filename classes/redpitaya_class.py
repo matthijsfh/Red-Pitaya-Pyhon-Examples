@@ -2,6 +2,8 @@ import sys
 import time
 import redpitaya_scpi as scpi
 import numpy as np
+import math
+import random
 
 # https://github.com/RedPitaya/RedPitaya/blob/master/scpi-server/src/scpi-commands.c#L96-L204
 # <source> = {DISABLED, NOW, CH1_PE, CH1_NE, CH2_PE, CH2_NE, EXT_PE, EXT_NE, AWG_PE, AWG_NE} Default: DISABLED
@@ -17,16 +19,17 @@ import numpy as np
 #==============================================================================
 class redpitaya_scope:
     rp = []
-    NrSamples           = int(16384)
-    Decimation          = 1;
-    Frequency           = 125e6/(Decimation * NrSamples)
-    SampleFrequency     = 125e6
-    Duration            = (Decimation * NrSamples) / SampleFrequency
-    Gain                = np.array([1, 1])
-    Probe               = np.array([1, 1])
-    TriggerDelay        = 0
-    Decimation_Array    = np.array([1, 8, 64, 1024, 8192, 65536])
-    Average             = 0;
+    NrSamples             = int(16384)
+    Decimation            = 1;
+    Frequency             = 125e6/(Decimation * NrSamples)
+    SampleFrequency       = 125e6
+    Duration              = (Decimation * NrSamples) / SampleFrequency
+    Gain                  = np.array([1, 1])
+    Probe                 = np.array([1, 1])
+    TriggerDelay          = 0
+    Decimation_Array      = np.array([1, 8, 64, 1024, 8192, 65536])
+    Decimation_Array_Beta = np.array([1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536])
+    Average               = 0;
     
     def __init__(self, pitaya):
         self.rp = pitaya
@@ -95,6 +98,22 @@ class redpitaya_scope:
         self.WriteDecimation()
         return
     
+    #==============================================================================
+    # Starting from version 1.04-9 (BETA) the full list of decimations is available
+    # 1,2,4,8,16,32,64,128,256,1024,2048,4096,8192,16384,32768,65536 
+    #==============================================================================
+    def SetDecimationBeta(self, Decimation_Index):
+        if (Decimation_Index >= np.size(self.Decimation_Array_Beta)):
+            print("Error decimation not valid!")
+            self.Decimation = 1;
+        else:
+            self.Decimation = self.Decimation_Array_Beta[Decimation_Index];
+
+        self.Frequency = 125e6/(self.Decimation)
+        self.Duration  = (self.Decimation * self.NrSamples) / self.SampleFrequency
+        self.WriteDecimation()
+        return
+
     def WriteDecimation(self):
         self.rp.tx_txt('ACQ:DEC ' + str(self.Decimation) )
         return
@@ -155,7 +174,7 @@ class redpitaya_scope:
         print("Trigger Delay   : %d samples" % (self.TriggerDelay))
         print("Trigger Level   : %.3f Volt" % (self.TriggerLevel))
         print("Range 1         : +/-%.1f Volt" % self.Gain[0])
-        print("Range 1         : +/-%.1f Volt" % self.Gain[1])
+        print("Range 2         : +/-%.1f Volt" % self.Gain[1])
         print("Probe 1         : %.0fx" % self.Probe[0])
         print("Probe 2         : %.0fx" % self.Probe[1])
         return;
@@ -164,6 +183,11 @@ class redpitaya_scope:
         TimeVector = np.arange(self.NrSamples) / self.Frequency
         return TimeVector
     
+    def GetTriggerVector(self):
+        TriggerVector = np.ones((2,1)) * ((self.NrSamples/2) - self.TriggerDelay) / self.Frequency
+        return TriggerVector
+    
+
     def SetInputGain(self, Channel = 1, Gain='LV'):
         if (Channel == 1):
             if 'LV' in Gain:
@@ -219,7 +243,7 @@ class redpitaya_generator:
     #==============================================================================
     # Sine wave
     #==============================================================================
-    def Sine(self, Channel = 1, Amplitude = 1.0, Frequency = 100):
+    def Sine(self, Channel = 1, Amplitude = 1.0, Frequency = 100.0):
         self.GenSignalType[Channel - 1] = 0
         self.Amplitude[Channel - 1] = Amplitude
         self.Frequency[Channel - 1] = Frequency
@@ -241,8 +265,16 @@ class redpitaya_generator:
                 self.rp.tx_txt('SOUR1:FUNC SQUARE')       
     
             if (Channel == 2):
-                self.rp.tx_txt('SOUR2:FUNC SQUARE')        
-
+                self.rp.tx_txt('SOUR2:FUNC SQUARE')    
+                
+        # ARBITRARY
+        if (self.GenSignalType[Channel -1] == 6):
+            if (Channel == 1):
+                self.rp.tx_txt('SOUR1:FUNC ARBITRARY')       
+    
+            if (Channel == 2):
+                self.rp.tx_txt('SOUR2:FUNC ARBITRARY')    
+                
         # generic configuration
         if (Channel == 1):
             Ampl = ("%.3f" % self.Amplitude[0])
@@ -259,13 +291,42 @@ class redpitaya_generator:
     #==============================================================================
     # Square wave
     #==============================================================================
-    def Square(self, Channel = 1, Amplitude = 1.0, Frequency = 100):
+    def Square(self, Channel = 1, Amplitude = 1.0, Frequency = 100.0):
         self.GenSignalType[Channel - 1] = 1
         self.Amplitude[Channel - 1] = Amplitude
         self.Frequency[Channel - 1] = Frequency
         self.ConfigureSignalGen(Channel)
         return
         
+    #==============================================================================
+    # Noise wave (ARBITRARY)
+    #==============================================================================
+    def Noise(self, Channel = 1, Amplitude = 1.0, Frequency = 100.0):
+
+        # Frequency for the entire buffer.
+        self.GenSignalType[Channel - 1] = 6
+        self.Amplitude[Channel - 1] = Amplitude
+        self.Frequency[Channel - 1] = Frequency
+        
+        BUFF_SIZE = 16384
+        z = ''
+        
+        for i in range(0, BUFF_SIZE-2):
+            z += str(2.0 * random.random() - 1.0) + ', '
+
+        z += str(2.0 * random.random() - 1.0)
+
+        # last sample without "," after it.
+        if (Channel == 1):
+            self.rp.tx_txt('SOUR1:TRAC:DATA:DATA ' + z)
+
+        if (Channel == 2):
+            self.rp.tx_txt('SOUR2:TRAC:DATA:DATA ' + z)
+        
+        self.ConfigureSignalGen(Channel)
+
+        return    
+    
     def EnableOutput(self, Channel = 1):
         if (Channel == 1):
             self.rp.tx_txt('OUTPUT1:STATE ON')
@@ -276,6 +337,20 @@ class redpitaya_generator:
     def EnableBothOutputs(self):
         self.rp.tx_txt('OUTPUT:STATE ON')
         return
+    
+    def PrintSettings(self):
+        Duration = 1/ self.Frequency
+        
+        print("-------------------------------------------")
+        print("Duration 1      : %.3f sec @ 16384 points" % (Duration[0]))
+        print("Frequency 1     : %.0f Hz" % (self.Frequency[0] * 16384))
+        print("Amplitude 1     : %.3f Volt" % self.Amplitude[0])
+        print("-------------------------------------------")
+        print("Duration 2      : %.3f sec @ 16384 points" % (Duration[1]))
+        print("Frequency 2     : %.0f Hz" % (self.Frequency[1] * 16384))
+        print("Amplitude 2     : %.3f Volt" % self.Amplitude[1])
+        print("-------------------------------------------")
+        return;    
         
 
 
