@@ -1,7 +1,7 @@
 #==============================================================================
 # Simple scope script using scpi interface to te RP.
 # Not very fast, but enough to check if there is data and 
-# for example the signal generator is running
+# check for example the signal generator is running.
 #
 # M. Hajer, 2021
 #==============================================================================
@@ -18,7 +18,9 @@ from redpitaya_class import redpitaya_scope as redpitaya_scope
 import addcopyfighandler
 import mplcursors
 
-
+#==============================================================================
+# Prepare a plot and store the line handles for easy update later.
+#==============================================================================
 def PreparePlot(Scope):
     fig = plt.figure()
     ax1 = plt.subplot(111)
@@ -27,8 +29,9 @@ def PreparePlot(Scope):
     ax1.set_ylim([-20.0, 20.0])
 
     x = Scope.GetTimeVector() * 1000
+
+    # Extra vertical line to indicate the trigger moment
     x_trig = Scope.GetTriggerVector() * 1000
-    
     y_trig = np.array([-1.0 , 1.0]) * 20.0
    
     y1 = np.zeros((16384, 1))
@@ -42,6 +45,14 @@ def PreparePlot(Scope):
     line2,       = ax1.plot(x, y2, 'b-', label=label_ch2) # Returns a tuple of line objects, thus the comma
     triggerline, = ax1.plot(x_trig, y_trig, 'r-') 
 
+    # Set plot axes based on probe scaling
+    if (Scope.GetProbeGain(Probe = 1) == 10):
+        SetPlotYAxis(ax1, 20)
+    elif (Scope.GetProbeGain(Probe = 2) == 10):
+        SetPlotYAxis(ax1, 20)
+    else:
+        SetPlotYAxis(ax1, 2)
+
     leg = ax1.legend();
    
     plt.tight_layout()
@@ -50,6 +61,10 @@ def PreparePlot(Scope):
     return fig, plt, line1, line2, triggerline, ax1
 
 
+#==============================================================================
+# Update the X & Y axes based on the actual scope setttings
+# Generate minor ticks
+#==============================================================================
 def SetPlotYAxis(axis, YRange):
     Major = YRange / 10;
     Minor = YRange / 100;
@@ -65,6 +80,10 @@ def SetPlotYAxis(axis, YRange):
     return
     
 
+#==============================================================================
+# Axctual plotting function. 
+# Called when data is available
+#==============================================================================
 def UpdatePlot(fig, line1, line2, Data1, Data2):
     line1.set_ydata(Data1)
     line2.set_ydata(Data2)
@@ -74,13 +93,17 @@ def UpdatePlot(fig, line1, line2, Data1, Data2):
             
     return
 
+
+#==============================================================================
+# Main
+#==============================================================================
 def main():
     ip = "192.168.3.150"
     
     # create a scpi object.
     Pitaya = scpi.scpi(ip)
    
-    # Create a scope object and set some defaults
+    # Create a scope object and set some parameters
     Scope = redpitaya_scope(Pitaya);     
     Scope.SetDecimationBeta(10)    
     Scope.SetInputGain(Channel = 1, Gain = 'LV')
@@ -91,38 +114,40 @@ def main():
     Scope.SetTrigger(Trigger = "NOW")
        
     try:
-        # while True:
-        Scope.SetTrigger(Trigger = "DISABLED")
-        Scope.Start()   
-
-        time.sleep(1)
-
-        Scope.SetTrigger(Trigger = "CH1_PE", Level = 0.5, Delay = 8192)
-        Scope.PrintSettings()
-        Scope.WaitForTrigger()
-
-        [fig, plt, line1, line2, triggerline, ax1] = PreparePlot(Scope)
+        while True:
+            Scope.SetTrigger(Trigger = "DISABLED")
+            Scope.Start()   
     
-        # Set plot axes based on probe scaling
-        if (Scope.GetProbeGain(Probe = 1) == 10):
-            SetPlotYAxis(ax1, 20)
-        elif (Scope.GetProbeGain(Probe = 2) == 10):
-            SetPlotYAxis(ax1, 20)
-        else:
-            SetPlotYAxis(ax1, 2)
+            # Sleep is only needed when trigger delay = 0 (middle of the data) 
+            # In that case we want to make sure the pre-trigger buffer is full
+            # before setting the actual trigger.
+            # time.sleep(1)
+    
+            Scope.SetTrigger(Trigger = "CH1_PE", Level = 0.5, Delay = 8192)
+            Scope.PrintSettings()
 
-        # Timing with the scpi interface is not very good.
-        # Add sleep(some number) if data seems not oke.
-        # Make sure to wait long enoug for the measurement to finish.
-        time.sleep(1)
+            [fig, plt, line1, line2, triggerline, ax1] = PreparePlot(Scope)
 
-        Data1 = Scope.GetGain(1) * Scope.GetData_Txt(Channel = 1)
-        Data2 = Scope.GetGain(2) * Scope.GetData_Txt(Channel = 2)
-        
-        # Pitaya.tx_txt('ACQ:STOP');
-
-        print("Delay : %.6f Sec"  % ((8192-0)/Scope.Frequency))
-        UpdatePlot(fig, line1, line2, Data1, Data2)    
+            Scope.WaitForTrigger()
+    
+            # Timing with the scpi interface is not very good.
+            # Quite some timing overhead seems to be present.
+            
+            # WaitForTrigger() returns immediately after the trigger event
+            # and does not wait for the buffer to fill to the end.
+            # Add sleep(some number) if data seems not oke.
+            # sleep time can be calculated based on the sample frequency and the
+            # number of samples after the trigger event.
+            
+            time.sleep(1)
+    
+            Data1 = Scope.GetGain(1) * Scope.GetData_Txt(Channel = 1)
+            Data2 = Scope.GetGain(2) * Scope.GetData_Txt(Channel = 2)
+            
+            # Pitaya.tx_txt('ACQ:STOP');
+    
+            print("Trigger delay   : %.6f Sec"  % ((8192-0)/Scope.Frequency))
+            UpdatePlot(fig, line1, line2, Data1, Data2)    
    
     except KeyboardInterrupt:
         print('interrupted!')

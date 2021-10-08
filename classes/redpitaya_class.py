@@ -81,9 +81,9 @@ class redpitaya_scope:
         return np.fromstring(buff_string, sep=',')
         
     #==============================================================================
-    # Not all decimations do work. 
+    # Nov-2021: Not all decimations do work in the stable release of the red pitaya. 
     # This is error in the documentation on the website.
-    # I have tested and only: {1,8,64,1024,8192,65536} do works.
+    # I have tested and only: {1,8,64,1024,8192,65536} do work.
     # Confirmed by old pdf manual of RP.
     #==============================================================================
     def SetDecimation(self, Decimation_Index):
@@ -99,6 +99,7 @@ class redpitaya_scope:
         return
     
     #==============================================================================
+    # NOv-2021
     # Starting from version 1.04-9 (BETA) the full list of decimations is available
     # 1,2,4,8,16,32,64,128,256,1024,2048,4096,8192,16384,32768,65536 
     #==============================================================================
@@ -124,6 +125,7 @@ class redpitaya_scope:
     # Delay will shift the plot. 
     # 8192 will restult in triggered value as first sample of the data.
     # 0 will result in triggered value as mid point of the data
+    # -8192 will result in triggered value as last point of the data
     #==============================================================================
     def SetTrigger(self, Trigger = 'CH1_PE', Level = 0, Delay = 8192):
         self.TriggerConf = Trigger
@@ -183,6 +185,10 @@ class redpitaya_scope:
         TimeVector = np.arange(self.NrSamples) / self.Frequency
         return TimeVector
     
+    #==============================================================================
+    # Return the location of the trigger in the data. 
+    # Used in the plot to show the trigger location.
+    #==============================================================================
     def GetTriggerVector(self):
         TriggerVector = np.ones((2,1)) * ((self.NrSamples/2) - self.TriggerDelay) / self.Frequency
         return TriggerVector
@@ -250,44 +256,6 @@ class redpitaya_generator:
         self.ConfigureSignalGen(Channel)
         return
         
-    def ConfigureSignalGen(self, Channel = 1):
-        #sine
-        if (self.GenSignalType[Channel -1] == 0):
-            if (Channel == 1):
-                self.rp.tx_txt('SOUR1:FUNC SINE')       
-    
-            if (Channel == 2):
-                self.rp.tx_txt('SOUR2:FUNC SINE')        
-            
-        # square
-        if (self.GenSignalType[Channel -1] == 1):
-            if (Channel == 1):
-                self.rp.tx_txt('SOUR1:FUNC SQUARE')       
-    
-            if (Channel == 2):
-                self.rp.tx_txt('SOUR2:FUNC SQUARE')    
-                
-        # ARBITRARY
-        if (self.GenSignalType[Channel -1] == 6):
-            if (Channel == 1):
-                self.rp.tx_txt('SOUR1:FUNC ARBITRARY')       
-    
-            if (Channel == 2):
-                self.rp.tx_txt('SOUR2:FUNC ARBITRARY')    
-                
-        # generic configuration
-        if (Channel == 1):
-            Ampl = ("%.3f" % self.Amplitude[0])
-            self.rp.tx_txt('SOUR1:VOLT ' + str(Ampl))
-            self.rp.tx_txt('SOUR1:FREQ:FIX ' + str(self.Frequency[0]))        
-
-        if (Channel == 2):
-            Ampl = ("%.3f" % self.Amplitude[1])
-            self.rp.tx_txt('SOUR2:VOLT ' + str(Ampl))
-            self.rp.tx_txt('SOUR2:FREQ:FIX ' + str(self.Frequency[1]))        
-            
-        return
-
     #==============================================================================
     # Square wave
     #==============================================================================
@@ -327,6 +295,44 @@ class redpitaya_generator:
 
         return    
     
+    def ConfigureSignalGen(self, Channel = 1):
+        #sine
+        if (self.GenSignalType[Channel -1] == 0):
+            if (Channel == 1):
+                self.rp.tx_txt('SOUR1:FUNC SINE')       
+    
+            if (Channel == 2):
+                self.rp.tx_txt('SOUR2:FUNC SINE')        
+            
+        # square
+        if (self.GenSignalType[Channel -1] == 1):
+            if (Channel == 1):
+                self.rp.tx_txt('SOUR1:FUNC SQUARE')       
+    
+            if (Channel == 2):
+                self.rp.tx_txt('SOUR2:FUNC SQUARE')    
+                
+        # ARBITRARY
+        if (self.GenSignalType[Channel -1] == 6):
+            if (Channel == 1):
+                self.rp.tx_txt('SOUR1:FUNC ARBITRARY')       
+    
+            if (Channel == 2):
+                self.rp.tx_txt('SOUR2:FUNC ARBITRARY')    
+                
+        # Set configuration for all wave forms configuration
+        if (Channel == 1):
+            Ampl = ("%.3f" % self.Amplitude[0])
+            self.rp.tx_txt('SOUR1:VOLT ' + str(Ampl))
+            self.rp.tx_txt('SOUR1:FREQ:FIX ' + str(self.Frequency[0]))        
+
+        if (Channel == 2):
+            Ampl = ("%.3f" % self.Amplitude[1])
+            self.rp.tx_txt('SOUR2:VOLT ' + str(Ampl))
+            self.rp.tx_txt('SOUR2:FREQ:FIX ' + str(self.Frequency[1]))        
+            
+        return
+
     def EnableOutput(self, Channel = 1):
         if (Channel == 1):
             self.rp.tx_txt('OUTPUT1:STATE ON')

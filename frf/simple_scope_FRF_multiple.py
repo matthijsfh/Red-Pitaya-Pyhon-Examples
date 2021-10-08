@@ -31,8 +31,8 @@ def PreparePlot(Scope):
     ax1.set_ylim([-20.0, 20.0])
 
     x = Scope.GetTimeVector() * 1000
+
     x_trig = Scope.GetTriggerVector() * 1000
-    
     y_trig = np.array([-1.0 , 1.0]) * 20.0
    
     y1 = np.zeros((16384, 1))
@@ -42,8 +42,8 @@ def PreparePlot(Scope):
     label_ch2 = ("Channel 2 (Probe %0.fx)" % + Scope.GetProbeGain(2))
     label_trig = ("Trigger position")
 
-    line1,       = ax1.plot(x, y1, 'g-', label=label_ch1) # Returns a tuple of line objects, thus the comma
-    line2,       = ax1.plot(x, y2, 'b-', label=label_ch2) # Returns a tuple of line objects, thus the comma
+    line1,       = ax1.plot(x, y1, 'g-', label=label_ch1) # Returns a tuple of line objects
+    line2,       = ax1.plot(x, y2, 'b-', label=label_ch2) # Returns a tuple of line objects
     triggerline, = ax1.plot(x_trig, y_trig, 'r-') 
 
     leg = ax1.legend();
