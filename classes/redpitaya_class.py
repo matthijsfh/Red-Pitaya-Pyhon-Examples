@@ -174,7 +174,7 @@ class redpitaya_scope:
             
         print("Trigger         : " + self.TriggerConf)
         print("Trigger Delay   : %d samples" % (self.TriggerDelay))
-        print("Trigger Level   : %.3f Volt" % (self.TriggerLevel))
+        print("Trigger Level   : %.3f Volt (on ADC level)" % (self.TriggerLevel))
         print("Range 1         : +/-%.1f Volt" % self.Gain[0])
         print("Range 2         : +/-%.1f Volt" % self.Gain[1])
         print("Probe 1         : %.0fx" % self.Probe[0])
@@ -185,6 +185,9 @@ class redpitaya_scope:
         TimeVector = np.arange(self.NrSamples) / self.Frequency
         return TimeVector
     
+    def GetDuration(self):
+        return self.Duration
+    
     #==============================================================================
     # Return the location of the trigger in the data. 
     # Used in the plot to show the trigger location.
@@ -192,6 +195,17 @@ class redpitaya_scope:
     def GetTriggerVector(self):
         TriggerVector = np.ones((2,1)) * ((self.NrSamples/2) - self.TriggerDelay) / self.Frequency
         return TriggerVector
+
+    def GetTriggerData(self):
+        TriggerData = np.array([-1.0 , 1.0]) * 2.0
+        
+        if (self.Gain[0] == 10) or (self.Gain[1] == 10):
+            TriggerData = TriggerData * 10
+        
+        if (self.Probe[0] == 10) or (self.Probe[1] == 10):
+            TriggerData = TriggerData * 10
+
+        return TriggerData
     
 
     def SetInputGain(self, Channel = 1, Gain='LV'):
@@ -229,6 +243,18 @@ class redpitaya_scope:
     def GetGain(self, Channel=1):
         Gain = self.Probe[Channel-1] * self.Gain[Channel-1]
         return Gain
+    
+    
+    def GetYRange(self):
+        Range = 2
+        if (self.Gain[0] == 10) or (self.Gain[1] == 10):
+            Range = Range * 10
+    
+        if (self.Probe[0] == 10) or (self.Probe[1] == 10):
+            Range = Range * 10
+        
+        return Range
+
 
 #==============================================================================
 # Signal generator class

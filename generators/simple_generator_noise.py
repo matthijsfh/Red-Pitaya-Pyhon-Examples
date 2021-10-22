@@ -38,7 +38,7 @@ def main():
     # Set frequency of generator to scopefreq/16384
 
     # Generator.Noise(Channel = 1, Amplitude = 1, Frequency = 30518.0 / 16384.0)
-    Generator.Noise(Channel = 1, Amplitude = 1, Frequency = 122070.0 / 16384.0)
+    Generator.Noise(Channel = 1, Amplitude = 0.5, Frequency = 122070.0 / 16384.0)
     # Generator.Noise(Channel = 1, Amplitude = 1, Frequency = 61035.0 / 16384.0)
 
     Generator.EnableOutput(Channel = 1)

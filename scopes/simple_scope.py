@@ -32,7 +32,7 @@ def PreparePlot(Scope):
 
     # Extra vertical line to indicate the trigger moment
     x_trig = Scope.GetTriggerVector() * 1000
-    y_trig = np.array([-1.0 , 1.0]) * 20.0
+    y_trig = Scope.GetTriggerData()
    
     y1 = np.zeros((16384, 1))
     y2 = np.zeros((16384, 1))
@@ -84,10 +84,17 @@ def SetPlotYAxis(axis, YRange):
 # Axctual plotting function. 
 # Called when data is available
 #==============================================================================
-def UpdatePlot(fig, line1, line2, Data1, Data2):
+def UpdatePlot(Scope, fig, line1, line2, triggerline, Data1, Data2):
     line1.set_ydata(Data1)
     line2.set_ydata(Data2)
     
+    
+    x_trig = Scope.GetTriggerVector() * 1000
+    y_trig = np.array([-1.0 , 1.0]) * 20.0
+
+    triggerline.set_xdata(x_trig)
+    triggerline.set_ydata(y_trig)
+
     fig.canvas.draw()
     fig.canvas.flush_events()
             
@@ -105,13 +112,15 @@ def main():
    
     # Create a scope object and set some parameters
     Scope = redpitaya_scope(Pitaya);     
-    Scope.SetDecimationBeta(10)    
+    Scope.SetDecimationBeta(8)    
     Scope.SetInputGain(Channel = 1, Gain = 'LV')
     Scope.SetInputGain(Channel = 2, Gain = 'LV')
     Scope.SetProbeGain(Probe = 1, Gain = 1)
     Scope.SetProbeGain(Probe = 2, Gain = 1)
     Scope.SetAverage(0)
     Scope.SetTrigger(Trigger = "NOW")
+
+    [fig, plt, line1, line2, triggerline, ax1] = PreparePlot(Scope)
        
     try:
         while True:
@@ -123,10 +132,9 @@ def main():
             # before setting the actual trigger.
             # time.sleep(1)
     
-            Scope.SetTrigger(Trigger = "CH1_PE", Level = 0.5, Delay = 8192)
+            Scope.SetTrigger(Trigger = "CH2_PE", Level = 0.0, Delay = 0)
+            # Scope.SetTrigger(Trigger = "NOW")
             Scope.PrintSettings()
-
-            [fig, plt, line1, line2, triggerline, ax1] = PreparePlot(Scope)
 
             Scope.WaitForTrigger()
     
@@ -147,7 +155,7 @@ def main():
             # Pitaya.tx_txt('ACQ:STOP');
     
             print("Trigger delay   : %.6f Sec"  % ((8192-0)/Scope.Frequency))
-            UpdatePlot(fig, line1, line2, Data1, Data2)    
+            UpdatePlot(Scope, fig, line1, line2, triggerline, Data1, Data2)    
    
     except KeyboardInterrupt:
         print('interrupted!')
