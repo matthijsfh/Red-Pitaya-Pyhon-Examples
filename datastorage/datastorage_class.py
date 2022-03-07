@@ -22,21 +22,20 @@ class datastorage_class:
         # self.name_list.append(in_name)
         self.name_list[in_name] = []
 
-        if (debug == 1):
-            print(self.name_list)
         return
 
     def add_data(self, in_name, in_data, debug = 0):
         old_data = self.name_list[in_name]
-
         new_data = np.append(old_data, in_data)
-
         self.name_list[in_name] = new_data
 
-        if (debug == 1):
-            print(self.name_list)
         return
 
+    def add_array(self, in_name, in_data, debug = 0):
+        self.name_list[in_name] = in_data
+
+        return
+    
     def get_data(self, in_name):
         return self.name_list[in_name]
 
@@ -54,8 +53,8 @@ class datastorage_class:
         ax.grid(True)
         return
 
-    def plot_data(self, ax, in_name_x, in_name_y, color=1, points_only=False, label='', title='', marker='', linewidth=1):
-        values_x = self.name_list[in_name_x]
+    def plot_data(self, ax, in_name_x, in_name_y, color=1, points_only=False, label='', title='', marker='', linewidth=1, x_offset=0):
+        values_x = self.name_list[in_name_x] + x_offset
         values_y = self.name_list[in_name_y]
 
         if (points_only):

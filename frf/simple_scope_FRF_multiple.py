@@ -96,7 +96,7 @@ def main():
     Scope.SetAverage(0)
     Scope.SetTrigger(Trigger = "NOW")
        
-    N = 5
+    N = 10
     Data1 = np.zeros((N, Scope.NrSamples));
     Data2 = np.zeros((N, Scope.NrSamples));
     

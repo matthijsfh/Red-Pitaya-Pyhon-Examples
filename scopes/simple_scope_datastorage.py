@@ -32,7 +32,7 @@ def prepare_datastorage():
 
 
 def prepare_measurement(Scope, Data):
-    Scope.SetDecimationBeta(8)    
+    Scope.SetDecimationBeta(10)    
     Scope.SetInputGain(Channel = 1, Gain = 'LV')
     Scope.SetInputGain(Channel = 2, Gain = 'LV')
     Scope.SetProbeGain(Probe = 1, Gain = 10)
@@ -60,7 +60,7 @@ def do_measurement(Scope, Data):
     # before setting the actual trigger.
     time.sleep(1)
     
-    Scope.SetTrigger(Trigger = "CH1_PE", Level = 0.01, Delay = 0)
+    Scope.SetTrigger(Trigger = "CH1_PE", Level = 0.1, Delay = 0)
     # Scope.SetTrigger(Trigger = "NOW")
     Scope.PrintSettings()
     
@@ -111,7 +111,7 @@ def plot_measurement(Scope, Data):
     SetPlotYAxis(Scope, Data, axes)
         
     axes.grid(visible=True)
-    axes.set(ylabel='Distance [mm]', xlabel='Time [mSec]')
+    axes.set(ylabel='value [-]', xlabel='Time [mSec]')
     axes.set_title(Data.title)
     
     return fig, axes
@@ -189,6 +189,9 @@ Data        = do_measurement(Scope, Data)
 fig, axes   = plot_measurement(Scope, Data)
 
 save_measurements(Scope, Data)
+
+mplcursors.cursor(axes, multiple=True)
+
 
 # load_meausurements(Scope, Data)
 
