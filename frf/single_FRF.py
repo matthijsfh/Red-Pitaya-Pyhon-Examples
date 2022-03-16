@@ -18,6 +18,7 @@ from redpitaya_class import redpitaya_scope as redpitaya_scope
 import addcopyfighandler
 import mplcursors
 from scipy.fft import fft, ifft
+from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 
 cls = lambda: print("\033[2J\033[;H", end='')
 
@@ -86,7 +87,7 @@ def main():
    
     # Create a scope object and set some defaults
     Scope = redpitaya_scope(Pitaya);     
-    Scope.SetDecimationBeta(10)    
+    Scope.SetDecimationBeta(13)    
     Scope.SetInputGain(Channel = 1, Gain = 'LV')
     Scope.SetInputGain(Channel = 2, Gain = 'LV')
     Scope.SetProbeGain(Probe = 1, Gain = 1)
@@ -149,14 +150,58 @@ def main():
         db_mag = 20 * np.log10(np.abs(H))
         phase = np.arctan2(np.imag(H), np.real(H)) * 180/np.pi
 
+        # fig = plt.figure()
+
+        # ax11 = plt.subplot(211)
+        # plt.semilogx(freq, db_mag)
+        # ax11.grid(which="both")
+        # ax11.set(ylabel='Gain [dB]', xlabel='Frequency [Hz]', title='Bode plot')
+        # ml = MultipleLocator(1)
+        # ax12.yaxis.set_minor_locator(ml)
+        # ax12.grid(which='minor', alpha=0.3)
+        # ax12.grid(which='major', alpha=1.0)
+        
+        # ax12 = plt.subplot(212)
+        # plt.semilogx(freq, phase)
+        # ax12.grid(which="both")
+        
+
+
         fig = plt.figure()
+        plt.minorticks_on()
+    
+        ax21 = plt.subplot(211)
+        ax21.grid(which="both")
+        plt.semilogx(freq, db_mag, 'b-')
+        plt.minorticks_on()
+        ax21.grid(which='minor', alpha=0.3)
+        ax21.grid(which='major', alpha=1.0)
+    
+        # Fix the minor grid lines on the upper Y-axis
+        # 1 dB on gain plot.
+        ml = MultipleLocator(1)
+        ax21.yaxis.set_minor_locator(ml)
+        ax21.grid(which='minor', alpha=0.3)
+        ax21.grid(which='major', alpha=1.0)
+        ax21.set(ylabel='Gain [dB]', xlabel='Frequency [Hz]', title='Bode plot')
+    
+    
+        ax22 = plt.subplot(212)
+        ax22.grid(which="both")
+        plt.semilogx(freq, phase, 'b-')
+        plt.minorticks_on()
+    
+        # Fix the minor grid lines on the lower Y-axis
+        # 10 degree on phase plot
+        ml = MultipleLocator(10)
+        ax22.yaxis.set_minor_locator(ml)
+        ax22.grid(which='minor', alpha=0.3)
+        ax22.grid(which='major', alpha=1.0)
+        ax22.set(ylabel='Phase [deg]', xlabel='Frequency [Hz]')
+        
+        
 
-        ax10 = plt.subplot(211)
-        plt.semilogx(freq, db_mag)
-        ax11 = plt.subplot(212)
-        plt.semilogx(freq, phase)
-
-    mplcursors.cursor([ax1, ax10, ax11], multiple=True)
+    mplcursors.cursor([ax21, ax22], multiple=True)
 
     plt.show()
 

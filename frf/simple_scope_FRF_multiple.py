@@ -88,7 +88,8 @@ def main():
    
     # Create a scope object and set some defaults
     Scope = redpitaya_scope(Pitaya);     
-    Scope.SetDecimationBeta(10)    
+    # Scope.SetDecimationBeta(10)    
+    Scope.SetDecimationBeta(13)    
     Scope.SetInputGain(Channel = 1, Gain = 'LV')
     Scope.SetInputGain(Channel = 2, Gain = 'LV')
     Scope.SetProbeGain(Probe = 1, Gain = 1)
@@ -96,11 +97,14 @@ def main():
     Scope.SetAverage(0)
     Scope.SetTrigger(Trigger = "NOW")
        
-    N = 10
+    N = 3
     Data1 = np.zeros((N, Scope.NrSamples));
     Data2 = np.zeros((N, Scope.NrSamples));
     
     for i in range(N):
+        print("------------------------------------------")
+        print("Run             : %d of %d"  % (i, N))
+ 
         Scope.Start()   
         time.sleep(1)
 
@@ -174,9 +178,7 @@ def main():
     ax12.grid(which='major', alpha=1.0)
 
 
-    # ax12.xaxis.set_minor_locator(locmin)
-    # ax12.xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
-
+    # Average plot
     fig = plt.figure()
     plt.minorticks_on()
 
@@ -209,10 +211,7 @@ def main():
     ax22.grid(which='major', alpha=1.0)
     ax22.set(ylabel='Phase [deg]', xlabel='Frequency [Hz]')
 
-
-
     mplcursors.cursor([ax11, ax12, ax21, ax22], multiple=True)
-
 
     plt.show()
 
