@@ -16,11 +16,14 @@ import redpitaya_scpi as scpi
 import numpy as np
 from redpitaya_class import redpitaya_scope as redpitaya_scope
 import datastorage_class as ds
+
+import matplotlib
+matplotlib.use('Qt5Agg')
+
 import matplotlib.pyplot as plt
 import addcopyfighandler
 import mplcursors
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
-
 
 def prepare_datastorage():
     #--------------------------------------------------------------------------
@@ -30,12 +33,11 @@ def prepare_datastorage():
 
     return Data
 
-
 def prepare_measurement(Scope, Data):
-    Scope.SetDecimationBeta(10)    
+    Scope.SetDecimationBeta(11)    
     Scope.SetInputGain(Channel = 1, Gain = 'LV')
     Scope.SetInputGain(Channel = 2, Gain = 'LV')
-    Scope.SetProbeGain(Probe = 1, Gain = 10)
+    Scope.SetProbeGain(Probe = 1, Gain = 1)
     Scope.SetProbeGain(Probe = 2, Gain = 1)
     Scope.SetAverage(0)
     Scope.SetTrigger(Trigger = "NOW")
@@ -50,7 +52,6 @@ def prepare_measurement(Scope, Data):
     
     return Data
 
-
 def do_measurement(Scope, Data):
     Scope.SetTrigger(Trigger = "DISABLED")
     Scope.Start()   
@@ -60,8 +61,8 @@ def do_measurement(Scope, Data):
     # before setting the actual trigger.
     time.sleep(1)
     
-    Scope.SetTrigger(Trigger = "CH1_PE", Level = 0.1, Delay = 0)
-    # Scope.SetTrigger(Trigger = "NOW")
+    # Scope.SetTrigger(Trigger = "CH1_PE", Level = 0.1, Delay = 0)
+    Scope.SetTrigger(Trigger = "NOW")
     Scope.PrintSettings()
     
     Scope.WaitForTrigger()
@@ -170,31 +171,31 @@ def load_meausurements(Scope, Data):
 #==============================================================================
 # Main
 #==============================================================================
-ip = "192.168.3.150"
+def main():
+    ip = "192.168.3.150"
 
-# datastorage class to handle data & plotting    
-Data            = prepare_datastorage()
+    # datastorage class to handle data & plotting    
+    Data            = prepare_datastorage()
+    
+    # option to load old data
+    # data.load_data('Simulation_200mm_250mm_0.6sec_22.data')
+    
+    # create a scpi object.
+    Pitaya = scpi.scpi(ip)
+       
+    # Create a scope object and set some parameters
+    Scope = redpitaya_scope(Pitaya);     
+    
+    Data        = prepare_measurement(Scope, Data)
+    Data        = do_measurement(Scope, Data)
+    fig, axes   = plot_measurement(Scope, Data)
+    
+    save_measurements(Scope, Data)
+    
+    mplcursors.cursor(axes, multiple=True)
 
-# option to load old data
-# data.load_data('Simulation_200mm_250mm_0.6sec_22.data')
+    # load_meausurements(Scope, Data)
+    Pitaya.close()
 
-# create a scpi object.
-Pitaya = scpi.scpi(ip)
-   
-# Create a scope object and set some parameters
-Scope = redpitaya_scope(Pitaya);     
-
-Data        = prepare_measurement(Scope, Data)
-Data        = do_measurement(Scope, Data)
-fig, axes   = plot_measurement(Scope, Data)
-
-save_measurements(Scope, Data)
-
-mplcursors.cursor(axes, multiple=True)
-
-
-# load_meausurements(Scope, Data)
-
-Pitaya.close()
-
-
+if __name__== "__main__":
+    main()

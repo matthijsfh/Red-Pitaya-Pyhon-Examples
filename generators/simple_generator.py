@@ -28,8 +28,8 @@ def main():
    
     # Create a scope object and set some defaults
     Generator = redpitaya_generator(Pitaya);     
-    # Generator.Sine(Channel = 1, Amplitude = 1, Frequency = 500)
-    Generator.Square(Channel = 1, Amplitude = 0.5, Frequency = 10)
+    Generator.Sine(Channel = 1, Amplitude = 1, Frequency = 50)
+    # Generator.Square(Channel = 1, Amplitude = 0.5, Frequency = 100)
     Generator.EnableOutput(Channel = 1)
 
     # Generator.Square(Channel = 2, Amplitude = 0.5, Frequency = 2000)

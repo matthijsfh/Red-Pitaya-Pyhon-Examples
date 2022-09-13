@@ -97,13 +97,13 @@ def main():
     Scope.SetAverage(0)
     Scope.SetTrigger(Trigger = "NOW")
        
-    N = 3
+    N = 10
     Data1 = np.zeros((N, Scope.NrSamples));
     Data2 = np.zeros((N, Scope.NrSamples));
     
     for i in range(N):
         print("------------------------------------------")
-        print("Run             : %d of %d"  % (i, N))
+        print("Run             : %d of %d"  % (i+1, N))
  
         Scope.Start()   
         time.sleep(1)

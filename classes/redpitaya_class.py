@@ -321,6 +321,61 @@ class redpitaya_generator:
 
         return    
     
+    #==============================================================================
+    # Noise wave (ARBITRARY)
+    #==============================================================================
+    def ComplexDemo(self, Channel = 1, Amplitude = 1.0, Frequency = 100.0):
+
+        # Frequency for the entire buffer.
+        self.GenSignalType[Channel - 1] = 6
+        self.Amplitude[Channel - 1] = Amplitude
+        self.Frequency[Channel - 1] = Frequency
+        
+        BUFF_SIZE = 16384
+        
+        y = ''
+        x = ''
+        t = []
+        
+        for i in range(0, BUFF_SIZE):
+            t.append((2 * math.pi) / BUFF_SIZE * i)
+        
+        for i in range(0, BUFF_SIZE-1):
+            if(i != BUFF_SIZE-2):
+                b = math.sin(t[i]) + (1.0/3.0) + math.sin(t[i] * 3)
+    
+                if(b <= -1 or b >= 1):
+                    x += str(-1.0) + ', '
+                    y += str(-1.0) + ', '
+                else:
+                    x += str(math.sin(t[i]) + (1.0/3.0) + math.sin(t[i] * 3)) + ', '
+                    y += str((1.0 / 2.0) * math.sin(t[i]) + (1.0/4.0) * math.sin(t[i] * 4)) + ', '
+                    
+            else:
+                c = math.sin(t[i]) + (1.0/3.0) + math.sin(t[i] * 3)
+                if(c <= -1 or c >= 1):
+                    x += str(-1.0)
+                    y += str(-1.0)
+                else:
+                    x += str(math.sin(t[i]) + (1.0/3.0) + math.sin(t[i] * 3))
+                    y += str((1.0 / 2.0) * math.sin(t[i]) + (1.0/4.0) * math.sin(t[i] * 4))
+                
+
+
+        # last sample without "," after it.
+        if (Channel == 1):
+            self.rp.tx_txt('SOUR1:TRAC:DATA:DATA ' + x)
+
+        if (Channel == 2):
+            self.rp.tx_txt('SOUR2:TRAC:DATA:DATA ' + y)
+        
+        self.ConfigureSignalGen(Channel)
+
+        return    
+    
+    
+    
+    
     def ConfigureSignalGen(self, Channel = 1):
         #sine
         if (self.GenSignalType[Channel -1] == 0):
