@@ -35,8 +35,8 @@ def prepare_datastorage():
 
 def prepare_measurement(Scope, Data):
     Scope.SetDecimationBeta(11)    
-    Scope.SetInputGain(Channel = 1, Gain = 'LV')
-    Scope.SetInputGain(Channel = 2, Gain = 'LV')
+    Scope.SetInputGain(Channel = 1, Gain = 'HV')
+    Scope.SetInputGain(Channel = 2, Gain = 'HV')
     Scope.SetProbeGain(Probe = 1, Gain = 1)
     Scope.SetProbeGain(Probe = 2, Gain = 1)
     Scope.SetAverage(0)
@@ -172,7 +172,7 @@ def load_meausurements(Scope, Data):
 # Main
 #==============================================================================
 def main():
-    ip = "192.168.3.150"
+    ip = "192.168.3.151"
 
     # datastorage class to handle data & plotting    
     Data            = prepare_datastorage()
@@ -184,7 +184,7 @@ def main():
     Pitaya = scpi.scpi(ip)
        
     # Create a scope object and set some parameters
-    Scope = redpitaya_scope(Pitaya);     
+    Scope = redpitaya_scope(Pitaya);  
     
     Data        = prepare_measurement(Scope, Data)
     Data        = do_measurement(Scope, Data)
