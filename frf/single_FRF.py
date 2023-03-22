@@ -17,7 +17,9 @@ import numpy as np
 from redpitaya_class import redpitaya_scope as redpitaya_scope
 import addcopyfighandler
 import mplcursors
-from scipy.fft import fft, ifft
+
+from scipy.fft import fft
+
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 
 cls = lambda: print("\033[2J\033[;H", end='')
@@ -87,7 +89,8 @@ def main():
    
     # Create a scope object and set some defaults
     Scope = redpitaya_scope(Pitaya);     
-    Scope.SetDecimationBeta(13)    
+    # Scope.SetDecimationBeta(13)    
+    Scope.SetDecimationBeta(10)    
     Scope.SetInputGain(Channel = 1, Gain = 'LV')
     Scope.SetInputGain(Channel = 2, Gain = 'LV')
     Scope.SetProbeGain(Probe = 1, Gain = 1)

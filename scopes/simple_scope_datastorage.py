@@ -172,7 +172,7 @@ def load_meausurements(Scope, Data):
 # Main
 #==============================================================================
 def main():
-    ip = "192.168.3.151"
+    ip = "192.168.3.150"
 
     # datastorage class to handle data & plotting    
     Data            = prepare_datastorage()

@@ -88,8 +88,8 @@ def main():
    
     # Create a scope object and set some defaults
     Scope = redpitaya_scope(Pitaya);     
-    # Scope.SetDecimationBeta(10)    
-    Scope.SetDecimationBeta(13)    
+    Scope.SetDecimationBeta(10)    
+    # Scope.SetDecimationBeta(13)    
     Scope.SetInputGain(Channel = 1, Gain = 'LV')
     Scope.SetInputGain(Channel = 2, Gain = 'LV')
     Scope.SetProbeGain(Probe = 1, Gain = 1)
