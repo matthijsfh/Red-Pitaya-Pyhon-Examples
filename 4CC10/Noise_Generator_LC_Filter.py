@@ -18,7 +18,9 @@ import math
 import random
 from redpitaya_class import redpitaya_scope as redpitaya_scope
 from redpitaya_class import redpitaya_generator as redpitaya_generator
-from mpldatacursor import datacursor
+
+import mplcursors
+
 import addcopyfighandler
 
 cls = lambda: print("\033[2J\033[;H", end='')
@@ -88,10 +90,9 @@ def main():
     # Generator.rp.tx_txt('SOUR1:TRAC:DATA:DATA ' + z)
     # Generator.rp.tx_txt('OUTPUT1:STATE ON')
     
-    
-    
     time.sleep(1)
     
+   
     # Very important to close the scpi socket each time.
     Pitaya.close()
     

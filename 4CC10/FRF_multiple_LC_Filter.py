@@ -79,6 +79,12 @@ def UpdatePlot(fig, line1, line2, Data1, Data2):
     return
 
 def main():
+    #-------------------------------------------------------
+    # Input 1   : yellow    : output of plant
+    # Input 2   : pink      : input noise
+    # Output 1  : green     : generated noise
+    #-------------------------------------------------------
+    
     cls()
     
     ip = "192.168.3.150"
@@ -97,7 +103,7 @@ def main():
     Scope.SetAverage(0)
     Scope.SetTrigger(Trigger = "NOW")
        
-    N = 5
+    N = 3
     Data1 = np.zeros((N, Scope.NrSamples));
     Data2 = np.zeros((N, Scope.NrSamples));
     
@@ -126,6 +132,10 @@ def main():
     
     for i in range(N):
         x = np.arange(0, Scope.NrSamples)
+
+        # Add hamming filter window to smooth begin and end of the data.
+        Data1[i] = Data1[i] * np.hamming(Scope.NrSamples)
+        Data2[i] = Data2[i] * np.hamming(Scope.NrSamples)
 
         G = fft(Data1[i]) / fft(Data2[i])
         length = len(G)

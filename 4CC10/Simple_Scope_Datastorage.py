@@ -35,7 +35,7 @@ def prepare_datastorage():
 
 def prepare_measurement(Scope, Data):
     # Scope.SetDecimationBeta(11)    
-    Scope.SetDecimationBeta(10)    
+    Scope.SetDecimationBeta(8)    
 
     Scope.SetInputGain(Channel = 1, Gain = 'LV')
     Scope.SetInputGain(Channel = 2, Gain = 'LV')
