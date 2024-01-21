@@ -19,33 +19,37 @@ class datastorage_class:
 
     def add_title(self, in_title):
         self.title = in_title
+        return
 
     def add_name(self, in_name, debug=0):
         # self.name_list.append(in_name)
         self.name_list[in_name] = []
-
         return
     
     def add_x_label(self, inLabel):
         self.xlabel = inLabel
+        return
 
     def add_y_label(self, inLabel):
         self.ylabel = inLabel
+        return
 
     def add_data(self, in_name, in_data, debug = 0):
         old_data = self.name_list[in_name]
         new_data = np.append(old_data, in_data)
         self.name_list[in_name] = new_data
-
         return
 
     def add_array(self, in_name, in_data, debug = 0):
         self.name_list[in_name] = in_data
-
         return
     
     def get_data(self, in_name):
         return self.name_list[in_name]
+    
+    def set_offset(self, in_name, in_offset):
+        self.name_list[in_name] = self.name_list[in_name] + in_offset
+        return 
 
     def plot_data_no_x(self, ax, in_name, color=1, points_only=False, label='', title='', marker='', linewidth=1):
         values = self.name_list[in_name]
@@ -81,29 +85,40 @@ class datastorage_class:
         
         return
     
-    def plot_data_bars(self, ax, in_name_x, in_name_y, color=1, label='', title='', width=1, barcount=1, barID=1):
+    def plot_data_bars_colors(self, ax, in_name_x, in_name_y, color="black", label='', title='', width=1, barcount=1, barID=1):
         values_x = self.name_list[in_name_x]
         values_y = self.name_list[in_name_y]
 
         if (barcount == 1):
             width = 0.5;
-            self.plot_bars(ax, values_x , values_y, color=color, label=label, title=title, width=width)
+            self.plot_bars_colors(ax, values_x , values_y, color=color, label=label, title=title, width=width)
 
         if (barcount == 2):
             width = 0.33;
             if (barID == 1):
-                self.plot_bars(ax, values_x - width/2, values_y, color=color, label=label, title=title, width=width)
+                self.plot_bars_colors(ax, values_x - width/2, values_y, color=color, label=label, title=title, width=width)
             if (barID == 2):
-                self.plot_bars(ax, values_x + width/2, values_y, color=color, label=label, title=title, width=width)
+                self.plot_bars_colors(ax, values_x + width/2, values_y, color=color, label=label, title=title, width=width)
 
         if (barcount == 3):
             width = 0.25;
             if (barID == 1):
-                self.plot_bars(ax, values_x - width, values_y, color=color, label=label, title=title, width=width)
+                self.plot_bars_colors(ax, values_x - width, values_y, color=color, label=label, title=title, width=width)
             if (barID == 2):
-                self.plot_bars(ax, values_x, values_y, color=color, label=label, title=title, width=width)
+                self.plot_bars_colors(ax, values_x, values_y, color=color, label=label, title=title, width=width)
             if (barID == 3):
-                self.plot_bars(ax, values_x + width, values_y, color=color, label=label, title=title, width=width)
+                self.plot_bars_colors(ax, values_x + width, values_y, color=color, label=label, title=title, width=width)
+
+        if (barcount == 4):
+            width = 0.2;
+            if (barID == 1):
+                self.plot_bars_colors(ax, values_x - 1.5 * width, values_y, color=color, label=label, title=title, width=width)
+            if (barID == 2):
+                self.plot_bars_colors(ax, values_x - 0.5 * width, values_y, color=color, label=label, title=title, width=width)
+            if (barID == 3):
+                self.plot_bars_colors(ax, values_x + 0.5 * width, values_y, color=color, label=label, title=title, width=width)
+            if (barID == 4):
+                self.plot_bars_colors(ax, values_x + 1.5 * width, values_y, color=color, label=label, title=title, width=width)
 
         ax.legend()
         ax.set(title=title)
@@ -136,7 +151,12 @@ class datastorage_class:
         ax.bar(point_x, point_y, label=label, color=dict_val, width=width)
         ax.legend()
         return
-    
+
+    def plot_bars_colors(self, ax, point_x, point_y, color="black", label='', title='', width=1):
+        ax.bar(point_x, point_y, label=label, color=color, width=width)
+        ax.legend()
+        return    
+
     def save_data(self, filename):
         with open(filename, 'wb') as filehandle:
             # store the data as binary data stream
