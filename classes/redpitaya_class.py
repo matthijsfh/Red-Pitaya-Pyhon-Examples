@@ -14,6 +14,10 @@ import random
 # <level> = {value in V}
 # <mode> = {AC,DC}
 
+# https://redpitaya.readthedocs.io/en/latest/appsFeatures/remoteControl/command_list.html#signal-generator
+# Set the signal frequency of a fast analog output.
+# For the ARBITRARY waveform, this is the frequency of one signal period (a buffer of 16384 samples).
+
 #==============================================================================
 # Scope class
 #==============================================================================
@@ -99,7 +103,7 @@ class redpitaya_scope:
         return
     
     #==============================================================================
-    # NOv-2021
+    # Nov-2021
     # Starting from version 1.04-9 (BETA) the full list of decimations is available
     # 1,2,4,8,16,32,64,128,256,1024,2048,4096,8192,16384,32768,65536 
     #==============================================================================
@@ -361,7 +365,6 @@ class redpitaya_generator:
                     y += str((1.0 / 2.0) * math.sin(t[i]) + (1.0/4.0) * math.sin(t[i] * 4))
                 
 
-
         # last sample without "," after it.
         if (Channel == 1):
             self.rp.tx_txt('SOUR1:TRAC:DATA:DATA ' + x)
@@ -373,9 +376,7 @@ class redpitaya_generator:
 
         return    
     
-    
-    
-    
+
     def ConfigureSignalGen(self, Channel = 1):
         #sine
         if (self.GenSignalType[Channel -1] == 0):
@@ -425,9 +426,27 @@ class redpitaya_generator:
         self.rp.tx_txt('OUTPUT:STATE ON')
         return
     
-    def PrintSettings(self):
+    def PrintSettings_Sine(self):
         Duration = 1/ self.Frequency
         
+        print("-------------------------------------------")
+        print("Sinewave")
+        print("-------------------------------------------")
+        print("Duration 1      : %.3f sec @ 16384 points" % (Duration[0]))
+        print("Frequency 1     : %.0f Hz" % (self.Frequency[0]))
+        print("Amplitude 1     : %.3f Volt" % self.Amplitude[0])
+        print("-------------------------------------------")
+        print("Duration 2      : %.3f sec @ 16384 points" % (Duration[1]))
+        print("Frequency 2     : %.0f Hz" % (self.Frequency[1]))
+        print("Amplitude 2     : %.3f Volt" % self.Amplitude[1])
+        print("-------------------------------------------")
+        return;    
+        
+    def PrintSettings_Noise(self):
+        Duration = 1/ self.Frequency
+        
+        print("-------------------------------------------")
+        print("Noise")
         print("-------------------------------------------")
         print("Duration 1      : %.3f sec @ 16384 points" % (Duration[0]))
         print("Frequency 1     : %.0f Hz" % (self.Frequency[0] * 16384))
@@ -439,5 +458,4 @@ class redpitaya_generator:
         print("-------------------------------------------")
         return;    
         
-
 

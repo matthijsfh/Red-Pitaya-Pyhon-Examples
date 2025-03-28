@@ -85,6 +85,23 @@ class datastorage_class:
         
         return
     
+    def plot_data_colors(self, ax, in_name_x, in_name_y, color="black", points_only=False, label='', title='', marker='', linewidth=1, x_offset=0):
+        values_x = self.name_list[in_name_x] + x_offset
+        values_y = self.name_list[in_name_y]
+
+        if (points_only):
+            self.plot_points_colors(ax, values_x, values_y, color=color, label=label, title=title, marker=marker, linewidth=linewidth)
+        else:
+            self.plot_results_colors(ax, values_x, values_y, color=color, label=label, title=title, marker=marker, linewidth=linewidth)
+
+        ax.legend()
+        ax.set(title=title)
+        ax.grid(True)
+        
+        ax.set(xlabel=self.xlabel, ylabel=self.ylabel)
+        
+        return
+    
     def plot_data_bars_colors(self, ax, in_name_x, in_name_y, color="black", label='', title='', width=1, barcount=1, barID=1):
         values_x = self.name_list[in_name_x]
         values_y = self.name_list[in_name_y]
@@ -136,8 +153,14 @@ class datastorage_class:
         ax.legend()
         ax.grid(True)
         return
-    # =================================================================================
 
+    def plot_results_colors(self, ax, time, value, color="black", label='', title='', marker='', linewidth=1):
+        ax.plot(time, value, label=label, color=color, marker=marker, linewidth=linewidth)
+        ax.legend()
+        ax.grid(True)
+        return
+
+    # =================================================================================
     def plot_points(self, ax, point_x, point_y, color=1, label='', title='', marker='.', linewidth=1):
         colors = dict(mcolors.CSS4_COLORS, **mcolors.CSS4_COLORS)
         dict_val = list(colors.values())[color]
@@ -145,6 +168,12 @@ class datastorage_class:
         ax.legend()
         return
     
+    def plot_points_colors(self, ax, point_x, point_y, color="black", label='', title='', marker='.', linewidth=1):
+        ax.scatter(point_x, point_y, label=label, color=color, marker=marker, linewidth=linewidth)
+        ax.legend()
+        return
+
+    # =================================================================================
     def plot_bars(self, ax, point_x, point_y, color=1, label='', title='', width=1):
         colors = dict(mcolors.CSS4_COLORS, **mcolors.CSS4_COLORS)
         dict_val = list(colors.values())[color]

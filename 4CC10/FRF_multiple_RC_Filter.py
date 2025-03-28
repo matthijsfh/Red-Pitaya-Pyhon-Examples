@@ -86,10 +86,9 @@ def main():
     # Input 1   : yellow    : output of plant
     # Input 2   : pink      : input noise
     # Output 1  : green     : generated noise
+    # All probes 1x
+    # Run Noise_Generator_LC_Filter.py first
     # -------------------------------------------------------
-
-    cls()
-
     ip = "192.168.3.150"
 
     # create a scpi object.
@@ -207,8 +206,7 @@ def main():
     ax21.grid(which="major", alpha=1.0)
     ax21.set(ylabel="Gain [dB]", xlabel="Frequency [Hz]", title="Bode plot")
 
-    plt.ylim([-40, 20])
-    plt.xlim([100, 100000])
+    plt.ylim([-50, 20])
 
     ax22 = plt.subplot(212)
     ax22.grid(which="both")
@@ -222,9 +220,6 @@ def main():
     ax22.grid(which="minor", alpha=0.3)
     ax22.grid(which="major", alpha=1.0)
     ax22.set(ylabel="Phase [deg]", xlabel="Frequency [Hz]")
-
-    plt.xlim([1, 10000])
-    plt.xlim([100, 100000])
 
     mplcursors.cursor([ax11, ax12, ax21, ax22], multiple=True)
 

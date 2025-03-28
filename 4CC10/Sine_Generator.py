@@ -39,18 +39,21 @@ def main():
 
     # Set frequency of generator to scopefreq/16384
 
-    #--------------------------------------------------------------------------------------------------------
-    # For the ARBITRARY waveform, this is the frequency of one signal period (a buffer of 16384 samples).
-    #--------------------------------------------------------------------------------------------------------
-    Generator.Noise(Channel = 1, Amplitude = 0.5, Frequency = 122070.0 / 16384.0)
-
     # Generator.Noise(Channel = 1, Amplitude = 1, Frequency = 30518.0 / 16384.0)
+    # Generator.Noise(Channel = 1, Amplitude = 0.5, Frequency = 122070.0 / 16384.0)
     # Generator.Noise(Channel = 1, Amplitude = 1, Frequency = 61035.0 / 16384.0)
     # Generator.Noise(Channel = 1, Amplitude = 1.0, Frequency = 15259.0 / 16384.0)
     
+    # Generator.Sine(Channel = 1, Amplitude = 0.5, Frequency = 100)
+    Generator.Sine(Channel = 1, Amplitude = 0.5, Frequency = 450)
+    # Generator.Sine(Channel = 1, Amplitude = 0.5, Frequency = 700)
+
+    Generator.Sine(Channel = 1, Amplitude = 0.5, Frequency = 10000)
+
     Generator.EnableOutput(Channel = 1)
-    Generator.PrintSettings_Noise()
+    Generator.PrintSettings_Sine()
     
+    # Generator.PrintSettings_Noise()
     
     # Generator.rp.tx_txt('SOUR1:FUNC ARBITRARY')
     # Generator.rp.tx_txt('SOUR1:VOLT 1')

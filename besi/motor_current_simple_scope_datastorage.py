@@ -34,9 +34,7 @@ def prepare_datastorage():
     return Data
 
 def prepare_measurement(Scope, Data):
-    # Scope.SetDecimationBeta(11)    
-    Scope.SetDecimationBeta(10)    
-
+    Scope.SetDecimationBeta(9)    
     Scope.SetInputGain(Channel = 1, Gain = 'LV')
     Scope.SetInputGain(Channel = 2, Gain = 'LV')
     Scope.SetProbeGain(Probe = 1, Gain = 1)
@@ -64,7 +62,8 @@ def do_measurement(Scope, Data):
     time.sleep(1)
     
     # Scope.SetTrigger(Trigger = "CH1_PE", Level = 0.1, Delay = 0)
-    Scope.SetTrigger(Trigger = "NOW")
+    # Scope.SetTrigger(Trigger = "NOW")
+    Scope.SetTrigger(Trigger = 'CH1_PE', Level = 0.016)
     Scope.PrintSettings()
     
     Scope.WaitForTrigger()
@@ -100,19 +99,15 @@ def plot_measurement(Scope, Data):
     
     fig, axes = plt.subplots(1, 1)
     plt.minorticks_on()
-    # plt.tight_layout()
+    plt.tight_layout()
 
-    # label_ch1 = ("Channel 1 (Probe %0.fx)" % + Scope.GetProbeGain(1))
-    # label_ch2 = ("Channel 2 (Probe %0.fx)" % + Scope.GetProbeGain(2))
-    # label_trig = ("Trigger position")
+    label_ch1 = ("Channel 1 (Probe %0.fx)" % + Scope.GetProbeGain(1))
+    label_ch2 = ("Channel 2 (Probe %0.fx)" % + Scope.GetProbeGain(2))
+    label_trig = ("Trigger position")
 
-    label_ch1 = ("Output [V]")
-    label_ch2 = ("Input [V]")
-    # label_trig = ("Trigger position")
-
-    Data.plot_data_colors(axes, "Time", "Channel 1", color="blue", points_only=False, label=label_ch1,  title='', marker='', linewidth=1)
-    Data.plot_data_colors(axes, "Time", "Channel 2", color="limegreen", points_only=False, label=label_ch2,  title='', marker='', linewidth=1)
-    # Data.plot_data(axes, "TriggerTime", "TriggerData", color=23, points_only=False, label=label_trig,  title='', marker='', linewidth=1)
+    Data.plot_data(axes, "Time", "Channel 1", color=21, points_only=False, label=label_ch1,  title='', marker='', linewidth=1)
+    Data.plot_data(axes, "Time", "Channel 2", color=22, points_only=False, label=label_ch2,  title='', marker='', linewidth=1)
+    Data.plot_data(axes, "TriggerTime", "TriggerData", color=23, points_only=False, label=label_trig,  title='', marker='', linewidth=1)
     
     SetPlotXAxis(Scope, Data, axes)
     SetPlotYAxis(Scope, Data, axes)

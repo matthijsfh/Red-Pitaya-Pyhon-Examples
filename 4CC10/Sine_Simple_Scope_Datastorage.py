@@ -35,7 +35,18 @@ def prepare_datastorage():
 
 def prepare_measurement(Scope, Data):
     # Scope.SetDecimationBeta(11)    
-    Scope.SetDecimationBeta(10)    
+    
+    # 100 Hz sine
+    # Scope.SetDecimationBeta(8)    
+
+    # 450 Hz sine
+    Scope.SetDecimationBeta(6)    
+
+    # 700 Hz sine
+    # Scope.SetDecimationBeta(6)    
+
+    Scope.SetDecimationBeta(5)    
+
 
     Scope.SetInputGain(Channel = 1, Gain = 'LV')
     Scope.SetInputGain(Channel = 2, Gain = 'LV')
@@ -61,7 +72,7 @@ def do_measurement(Scope, Data):
     # Sleep is only needed when trigger delay = 0 (middle of the data) 
     # In that case we want to make sure the pre-trigger buffer is full
     # before setting the actual trigger.
-    time.sleep(1)
+    time.sleep(2)
     
     # Scope.SetTrigger(Trigger = "CH1_PE", Level = 0.1, Delay = 0)
     Scope.SetTrigger(Trigger = "NOW")
@@ -110,8 +121,8 @@ def plot_measurement(Scope, Data):
     label_ch2 = ("Input [V]")
     # label_trig = ("Trigger position")
 
-    Data.plot_data_colors(axes, "Time", "Channel 1", color="blue", points_only=False, label=label_ch1,  title='', marker='', linewidth=1)
-    Data.plot_data_colors(axes, "Time", "Channel 2", color="limegreen", points_only=False, label=label_ch2,  title='', marker='', linewidth=1)
+    Data.plot_data_colors(axes, "Time", "Channel 1", color="orange", points_only=False, label=label_ch1,  title='', marker='', linewidth=1)
+    Data.plot_data_colors(axes, "Time", "Channel 2", color="blue", points_only=False, label=label_ch2,  title='', marker='', linewidth=1)
     # Data.plot_data(axes, "TriggerTime", "TriggerData", color=23, points_only=False, label=label_trig,  title='', marker='', linewidth=1)
     
     SetPlotXAxis(Scope, Data, axes)
