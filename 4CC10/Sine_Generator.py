@@ -45,10 +45,11 @@ def main():
     # Generator.Noise(Channel = 1, Amplitude = 1.0, Frequency = 15259.0 / 16384.0)
     
     # Generator.Sine(Channel = 1, Amplitude = 0.5, Frequency = 100)
-    Generator.Sine(Channel = 1, Amplitude = 0.5, Frequency = 450)
+    # Generator.Sine(Channel = 1, Amplitude = 0.5, Frequency = 450)
     # Generator.Sine(Channel = 1, Amplitude = 0.5, Frequency = 700)
 
-    Generator.Sine(Channel = 1, Amplitude = 0.5, Frequency = 10000)
+    Generator.Sine(Channel = 1, Amplitude = 0.5, Frequency = 1000)
+    Generator.Sine(Channel = 2, Amplitude = 0.5, Frequency = 1000)
 
     Generator.EnableOutput(Channel = 1)
     Generator.PrintSettings_Sine()
