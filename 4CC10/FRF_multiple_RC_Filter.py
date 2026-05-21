@@ -9,6 +9,7 @@
 import sys
 
 sys.path.append("../classes")
+sys.path.append('../datastorage')
 
 import os
 import time
@@ -88,6 +89,7 @@ def main():
     # Output 1  : green     : generated noise
     # All probes 1x
     # Run Noise_Generator_LC_Filter.py first
+    # LV settings all inputs
     # -------------------------------------------------------
     ip = "192.168.3.150"
 
@@ -96,6 +98,7 @@ def main():
 
     # Create a scope object and set some defaults
     Scope = redpitaya_scope(Pitaya)
+    
     Scope.SetDecimationBeta(10)
     # Scope.SetDecimationBeta(13)
     Scope.SetInputGain(Channel=1, Gain="LV")
@@ -223,8 +226,9 @@ def main():
 
     mplcursors.cursor([ax11, ax12, ax21, ax22], multiple=True)
 
-    plt.show()
+    Pitaya.close()
 
+    plt.show()
 
 if __name__ == "__main__":
     main()

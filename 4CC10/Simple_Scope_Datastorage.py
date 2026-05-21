@@ -18,7 +18,6 @@ from redpitaya_class import redpitaya_scope as redpitaya_scope
 import datastorage_class as ds
 
 import matplotlib
-matplotlib.use('Qt5Agg')
 
 import matplotlib.pyplot as plt
 import addcopyfighandler
@@ -118,7 +117,7 @@ def plot_measurement(Scope, Data):
     SetPlotYAxis(Scope, Data, axes)
         
     axes.grid(visible=True)
-    axes.set(ylabel='value [-]', xlabel='Time [mSec]')
+    axes.set(ylabel='value [Volt]', xlabel='Time [mSec]')
     axes.set_title(Data.title)
     
     return fig, axes
@@ -202,6 +201,8 @@ def main():
 
     # load_meausurements(Scope, Data)
     Pitaya.close()
+
+    plt.show()
 
 if __name__== "__main__":
     main()
