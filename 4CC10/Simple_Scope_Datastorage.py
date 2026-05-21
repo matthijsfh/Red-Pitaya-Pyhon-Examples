@@ -84,7 +84,7 @@ def do_measurement(Scope, Data):
     
     Data.add_data("Time", Scope.GetTimeVector() * 1000)
     Data.add_data("Channel 1",  Scope.GetGain(1) * Scope.GetData_Txt(Channel = 1))
-    Data.add_data("Channel 2",  Scope.GetGain(1) * Scope.GetData_Txt(Channel = 2))
+    Data.add_data("Channel 2",  Scope.GetGain(2) * Scope.GetData_Txt(Channel = 2))
 
     Data.add_data("TriggerTime", Scope.GetTriggerVector() * 1000)
     Data.add_data("TriggerData", Scope.GetTriggerData())

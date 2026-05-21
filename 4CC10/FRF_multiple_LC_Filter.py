@@ -90,7 +90,7 @@ def main():
 
     cls()
 
-    ip = "192.168.3.151"
+    ip = "192.168.3.150"
 
     # create a scpi object.
     Pitaya = scpi.scpi(ip)
